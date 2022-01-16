@@ -1,14 +1,5 @@
 #!/usr/bin/env python
 
-"""
-2022/01/07 23:30:00 +0900
-
-# batch_220107_233000.py
-# generated at /home/kooojiii/results/2021/misc/matsumoto_san/210107_1
-# usage: python %prog
-# python3.7
-
-"""
 
 import os,sys,glob,gzip
 import string
