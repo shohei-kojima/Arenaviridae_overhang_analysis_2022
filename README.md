@@ -1,6 +1,6 @@
 # Analyze overhangs of Arenaviruses  
   
-### Download Arenaviruses in NCBI refseq  
+### Analysis details  
 The sequences of arenaviruses in NCBI refseq database was downloaded by the following command on 2022 Jan 07. Then, the overhangs in the downloaded sequences were analyzed by a custom Python script.  
 ```
 # download sequences
