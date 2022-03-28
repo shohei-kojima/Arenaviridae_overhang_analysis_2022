@@ -8,9 +8,9 @@ import os,sys,glob,gzip
 import string
 
 
-start='CGCA'
+start='TCTCA'
 start_pos_threshold=8
-length_threshold=1000
+length_threshold=1
 len_start=len(start)
 
 
@@ -40,10 +40,40 @@ def format_overhang(seq):
             break
     return ['%s|%s' % (overhang, seq[pos:]), '%s|%s' % (overhang, seq[pos:pos + len_start]), overhang]
 
+def find_segment(h):
+    h=h.lower()
+    seg='NA'
+    if 'segment l' in h:
+        seg='segment L'
+    elif 'segment m' in h:
+        seg='segment M'
+    elif 'segment s' in h:
+        seg='segment S'
+    elif ' (l) ' in h:
+        seg='segment L'
+    elif ' (m) ' in h:
+        seg='segment M'
+    elif ' (s) ' in h:
+        seg='segment S'
+    elif ' l ' in h:
+        seg='segment L'
+    elif ' m ' in h:
+        seg='segment M'
+    elif ' s ' in h:
+        seg='segment S'
+    return seg
 
-f='Arenaviridae_210107_nuclotide.fa'
+def find_virus(h):
+    h=h.split(' ', 1)[1]
+    hlow=h.lower()
+    for pos in range(len(h) - 5):
+        if h[pos:pos+5] == 'virus':
+            return h[:pos+5]
+    return 'NA'
+
+f='Nairoviridae_210116_nuclotide.fa'
 fa=parse_fasta(f)
-out=['refseq\tfasta_header\tseq(5...3)\t5end\t3end(complement)\t5overhang\t3overhang(complement)\t5overhang_length\t3overhang_length\n']
+out=['refseq\tfasta_header\tvirus_name\tseq_length\tsegment\tseq(5...3)\t5end\t3end(complement)\t5overhang\t3overhang(complement)\t5overhang_length\t3overhang_length\n']
 for h in fa:
     seq=fa[h].upper().replace('U', 'T')
     if len(seq) < length_threshold:
@@ -53,8 +83,10 @@ for h in fa:
         l_format_full,l_format_trimmed,l_overhang=format_overhang( seq[:start_pos_threshold])
         r_format_full,r_format_trimmed,r_overhang=format_overhang(cseq[:start_pos_threshold])
         r_format_full=complement(r_format_full)
-        out.append('%s\t%s\t%s...%s\t%s\t%s\t%s\t%s\t%d\t%d\n' % (h.split(' ')[0], h, l_format_full, r_format_full, l_format_trimmed, r_format_trimmed, l_overhang, r_overhang, len(l_overhang), len(r_overhang)))
+        segment=find_segment(h)
+        virus=find_virus(h)
+        out.append('%s\t%s\t%s\t%s\t%s\t%s...%s\t%s\t%s\t%s\t%s\t%d\t%d\n' % (h.split(' ')[0], h, virus, len(seq), segment, l_format_full, r_format_full, l_format_trimmed, r_format_trimmed, l_overhang, r_overhang, len(l_overhang), len(r_overhang)))
 
 print(len(out))
-with open('arenaviridae_overhangs.tsv', 'w') as outfile:
+with open('nairoviridae.tsv', 'w') as outfile:
     outfile.write(''.join(out))
